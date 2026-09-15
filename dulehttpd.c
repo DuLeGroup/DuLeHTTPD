@@ -1,5 +1,6 @@
 #include "./dulehttpd_cli.h"
 #include "./dulehttpd_srv.h"
+#include "./dulehttpd_help.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -8,7 +9,8 @@
 int main(int argc,char* argv[]){
         if (argc > 1){
             if (!strcmp(argv[1],"-help")) {
-                printf("There's no help yet lol XD 67 sigma\n");
+                help();
+                //printf("There's no help yet lol XD 67 sigma\n");
                 return 0;
             }
         }   
