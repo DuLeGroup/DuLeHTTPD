@@ -72,7 +72,7 @@ int cli_body(int socket,int client,struct DuLeFile* file,char* mime,struct confi
     
     write(client, buf, strlen(buf));
 
-    if (cfg->show_debug_output == 2) fprintf(stderr, "write buffet(http headers)\n");
+    if (cfg->show_debug_output == 2) fprintf(stderr, "write buffet(http headers,cli_body())\n");
     write(client, file->body,file->size);
 
     if (cfg->show_debug_output == 2) fprintf(stderr, "write file->body\n");
@@ -84,8 +84,22 @@ int cli_body(int socket,int client,struct DuLeFile* file,char* mime,struct confi
 
 int cli_write(int socket,int client,int http_error_code,struct config* cfg){
     cli_headers(http_error_code,client);
+
+    if (cfg->show_debug_output == 2) printf("popaaaaZ\n");
+    
+    if ((http_error_code == 404) && (cfg->file_at_404)) {
+        struct DuLeFile* f;
+
+        f = read_file(cfg, cfg->file_at_404);
+        cli_body(socket, client, f, "text/html", cfg);
+        
+        free(f->body);
+        free(f);
+        return 0;
+    }
     // Allocate sufficient room for the full HTML response + integers + '\0'
     char default_error_page[512];
+    
 
     memset(default_error_page, 0, sizeof(default_error_page));
 
@@ -103,7 +117,6 @@ int cli_write(int socket,int client,int http_error_code,struct config* cfg){
     file->body = (char*)malloc(file->size+1);
     memset(file->body, 0, file->size+1);
     strncpy(file->body,default_error_page,file->size);
-    if (cfg->show_debug_output == 2) fprintf(stderr, "");
 
     cli_body(socket,client,file,"text/html",cfg);
     free(file->body);
@@ -120,11 +133,15 @@ int cli_response(int socket,int client,struct config* conf,struct http_req* req)
         cli_write(socket,client,400,conf);
         return 0;
     }
+    if ('/' != req->uri[0]) {
+        cli_write(socket, client, 400, conf);
+    }
     if (!strcmp(req->uri,"/")) {
         req->uri = "/index.html";
     }
-    
-    int allowed = is_file_allowed(req->uri,conf);
+    fprintf(stderr, "file allowance\n");
+    int allowed;
+    allowed = is_file_allowed(req->uri,conf);
     if (!allowed) {
         cli_write(socket,client,403,conf);
         return 0;

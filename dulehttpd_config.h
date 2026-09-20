@@ -186,10 +186,10 @@ int setup_config(int argcount,char* arguments[],struct config** conf){
                 fprintf(stderr, "Uf, less than kB of max icomming file size is tough\n");
             }
         }  else if (strcmp(type, "-404") == 0) {
-            printf("I hope you wrote the path respect to root folder(if you didn't set it, by default it's ~/.public/)\n");
+            printf("I hope you wrote the path respect to root folder(if you didn't set it, by default it's /var/www/)\n");
             (*conf)->file_at_404 = arguments[i+1];
         } else if (strcmp(type, "-403") == 0) {
-            printf("I hope you wrote the path respect to root folder(if you didn't set it, by default it's ~/.public/)\n");
+            printf("I hope you wrote the path respect to root folder(if you didn't set it, by default it's /var/www/)\n");
             (*conf)->file_at_403 = arguments[i+1];
         } else {
             fprintf(stderr, "Unknown argument/param or what you just wrote(btw I'm going further) %s\n",type);
